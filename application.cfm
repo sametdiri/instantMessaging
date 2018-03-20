@@ -1,0 +1,1 @@
+<cfapplication name="iMessage" sessionManagement="true">

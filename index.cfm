@@ -41,13 +41,34 @@
 			padding-left: 5px;
 			color: #ccc;
 		}
+		.chatbody, contactList{
+			width:fixed;
+		}
 	</style>
     <script>
-		var divName, params;
+		var interval = 5000;
+		var divName, params, url;
+		refreshDiv();
+		refreshchatbody();
+		function refreshContacts(){
+			url = "contactList.cfm";
+			div = "contactList";
+			params = "";
+			AJAXReqSend();			
+			setTimeout(refreshContacts, interval);
+		}
+		function refreshchatbody(){
+			url = "chatbody.cfm";
+			div = "chatbody";
+			params = "";
+			AJAXReqSend();			
+			setTimeout(refreshchatbody, interval);
+		}
+		
 		function AJAXReqSend(){
 			$.ajax({
 				type		: "POST",
-				url			: "mainWindow.cfm",
+				url			: url,
 				data		: params,
 				error		: function() {alert('Hata.. islem sayfasina erisilemedi\n Lütfen tekrar deneyiniz...');},
 				success 	: function(Sonuc) {
@@ -55,10 +76,26 @@
 											  }
 			});/**/
 		}
+		function nickSendEnter(e){
+			var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
+			if(charCode == 13){
+				nickSend();
+			}
+			
+		}
 		function nickSend(){
 			nick = $("#nick").val();
+			url = "islemler.cfm";
 			divName = "application";//the div is changed.
 			params = "islem=nickSend&nick="+nick;//the Params for querying.
+			AJAXReqSend();
+			refreshContacts();
+			refreshchatbody();
+		}
+		function logout(nickID){
+			url = "islemler.cfm";			
+			divName = "application";//the div is changed.
+			params = "islem=logout&nickID="+nickID;//the Params for querying.
 			AJAXReqSend();
 		}
 	</script>
@@ -70,7 +107,7 @@
 		<div class="row">
 			<div class="col-lg-4"></div>
 			<div class="col-lg-4">
-				<input type="text" id="nick" class="input input-lg" placeholder="Nick">
+				<input type="text" id="nick" class="input input-lg" placeholder="Nick" onKeyup="nickSendEnter(event);">
 				<button class="btn btn-info btn-lg" id="nickSend" onClick="nickSend();"><span class="glyphicon glyphicon-send"></span></button>
 			</div>
 			<div class="col-lg-4"></div>

@@ -1,25 +1,13 @@
+<cfoutput>
 <div class="container">
     <div class="row">
-        <div class="col-sm-4">
-            <a href="?msg=15" class="chatperson">
-                <span class="chatimg">
-                    <img src="http://via.placeholder.com/50x50?text=A" alt="" />
-                </span>
-                <div class="namechat">
-                    <div class="pname">Aperson name here</div>
-                    <div class="lastmsg">sdk nskdfjnlssdf sdf ss fsdaf kjlsadjf nkksaddbhk jasddl sdf kjsdfoashf89f sdbfoi nkksaddbhk jasddl</div>
-                </div>
-            </a>
+        <div class="col-sm-4" class="contactList" id="contactList">
+            <!---<cfinclude  template="contactList.cfm">--->
         </div>
         <div class="col-sm-8">
-            <div class="chatbody">
-                <table class="table">
-                    <tr>
-                        <td><img src="http://via.placeholder.com/50x50?text=A" /></td>
-                        <td>sdk fnsdkjnsadjnlk anflkjasdnflk kjasndlkfjnsdfs adfjksd ofh saddf lsdnflksnadl fjnasdfl ajsndflkja nlnfsdjlnf aslnfd as</td>
-                        <td>15:20</td>
-                    </tr>
-                </table>
+            <button class="btn btn-info btn-sm pull-right" title="Çıkış" onClick="logout(#Session.nickID#);"><span class="glyphicon glyphicon-remove"></span></button>
+            <div class="chatbody" id="chatbody">
+            <!---<cfinclude  template="chatbody.cfm">--->
             </div>
             <div class="row">
                 <div class="col-xs-9">
@@ -33,3 +21,4 @@
         </div>
     </div>
 </div>
+</cfoutput>
