@@ -7,6 +7,9 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	<!---<link href="/KOUBS/Samet/iMessage/resources/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="/KOUBS/Samet/iMessage/resources/js/bootstrap.min.js"></script>
+	<script src="/KOUBS/Samet/iMessage/resources/js/jquery.min.js"></script>--->
 	<style>
 		.chatperson{
 			display: block;
@@ -44,26 +47,92 @@
 		.chatbody, contactList{
 			width:fixed;
 		}
+		.avatar{
+			width:55px;
+			height:55px;
+		}
+		.msg{
+			width:80%;
+		}
+		.dtime{
+			width:10%;
+			font-size:8pt;
+			text-align:right;
+		}
 	</style>
     <script>
 		var interval = 5000;
-		var divName, params, url;
-		refreshDiv();
-		refreshchatbody();
+		var divName, params, url, sender, reciever;
+		function nickSendEnter(e){
+			var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
+			if(charCode == 13){
+				nickSend();
+			}
+		}
+		function nickSend(){
+			nick = $("#nick").val();
+			url = "islemler.cfm";
+			divName = "application";//the div is changed.
+			params = "islem=nickSend&nick="+nick;//the Params for querying.
+			//params = new FormData("#giris"),
+			//alert(params);
+			AJAXReqSend();
+			//refreshContacts();
+			//refreshchatbody();
+		}
+		function changeReciever(){
+			reciever = $("#reciever").val();
+		}
+		function changeSender(){
+			sender = $("#sender").val();
+		}
+		function messageSendEnter(e){
+			var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
+			if(charCode == 13){
+				messageSend();
+			}
+		}
+		function contactRequest(id){
+			url = "islemler.cfm";			
+			divName = "";//the div is changed.
+			params = "islem=contactAdd&nickID="+id;
+			AJAXReqSend();
+			alert("Arkadaşlık isteğiniz gönderildi!");
+		}
+		function messageSend(){
+			changeReciever();
+			changeSender();
+
+			message = $("#messageBody").val();
+			url = "islemler.cfm";
+			divName = "";//the div is changed.
+			params = "islem=messageSend&sender=" + sender + "&reciever=" + reciever + "&message="+message;//the Params for querying.
+			AJAXReqSend();
+			$("#messageBody").val('');
+		}
+		function logout(nickID){
+			url = "islemler.cfm";			
+			divName = "application";//the div is changed.
+			params = "islem=logout&nickID="+nickID;//the Params for querying.
+			AJAXReqSend();
+		}
+
+		//refreshContacts();
+		//refreshchatbody();
 		function refreshContacts(){
 			url = "contactList.cfm";
 			div = "contactList";
-			params = "";
+			params = "islem=contacts";
 			AJAXReqSend();			
 			setTimeout(refreshContacts, interval);
 		}
 		function refreshchatbody(){
 			url = "chatbody.cfm";
 			div = "chatbody";
-			params = "";
+			params = "islem=chat";
 			AJAXReqSend();			
 			setTimeout(refreshchatbody, interval);
-		}
+		}<!--- --->
 		
 		function AJAXReqSend(){
 			$.ajax({
@@ -76,28 +145,7 @@
 											  }
 			});/**/
 		}
-		function nickSendEnter(e){
-			var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
-			if(charCode == 13){
-				nickSend();
-			}
-			
-		}
-		function nickSend(){
-			nick = $("#nick").val();
-			url = "islemler.cfm";
-			divName = "application";//the div is changed.
-			params = "islem=nickSend&nick="+nick;//the Params for querying.
-			AJAXReqSend();
-			refreshContacts();
-			refreshchatbody();
-		}
-		function logout(nickID){
-			url = "islemler.cfm";			
-			divName = "application";//the div is changed.
-			params = "islem=logout&nickID="+nickID;//the Params for querying.
-			AJAXReqSend();
-		}
+		
 	</script>
 </head>
 <body>
@@ -107,8 +155,11 @@
 		<div class="row">
 			<div class="col-lg-4"></div>
 			<div class="col-lg-4">
-				<input type="text" id="nick" class="input input-lg" placeholder="Nick" onKeyup="nickSendEnter(event);">
+			<!---<form id="giris" enctype="multipart/form-data">
+				<input type="file" id="avatar" name="avatar">--->
+				<input type="text" id="nick" name="nick" class="input input-lg" placeholder="Nick" onKeyup="nickSendEnter(event);">
 				<button class="btn btn-info btn-lg" id="nickSend" onClick="nickSend();"><span class="glyphicon glyphicon-send"></span></button>
+			<!---</form>--->
 			</div>
 			<div class="col-lg-4"></div>
 		</div>

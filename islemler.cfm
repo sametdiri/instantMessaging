@@ -1,4 +1,4 @@
-<!---<cfdump  var="#form#">--->
+<!---<cfdump  var="#form#">  --->
 <cfif form.islem eq "nickSend">
     <cfquery datasource="iMsg" name="nickCheck">
         DECLARE @@nickID int = 0
@@ -20,8 +20,17 @@
         SELECT @@nickID AS nickID
     </cfquery>
     <cfset Session.nickID = nickCheck.nickID>
-    <cfdump  var="#Session#">
     <cfinclude  template="mainWindow.cfm">
+<cfelseif form.islem eq "messageSend">
+    <cfquery datasource="imsg" name="insertMsg">
+        INSERT INTO messages(senderID, recieverID, message)
+        VALUES (#form.sender#, #form.reciever#, '#form.message#')
+    </cfquery>
+<cfelseif form.islem eq "contactAdd">
+    <cfquery datasource="imsg" name="contactReq">
+        INSERT INTO contacts(nickID1, nickID2)
+        VALUES (#session.nickID#, ##)
+    </cfquery>
 <cfelseif form.islem eq "logout">
     <cfquery datasource="imsg" name="logoutUpdate">
         UPDATE  nicks 
