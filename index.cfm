@@ -95,9 +95,10 @@
 		function contactRequest(id){
 			url = "islemler.cfm";			
 			divName = "";//the div is changed.
-			params = "islem=contactAdd&nickID="+id;
+			params = "islem=contactAdd&reciever="+id;
 			AJAXReqSend();
 			alert("Arkadaşlık isteğiniz gönderildi!");
+			$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
 			changeReciever();

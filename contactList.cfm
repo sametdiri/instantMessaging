@@ -3,14 +3,16 @@
     SELECT	DISTINCT TOP (200) contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
     FROM	nicks INNER JOIN
             contacts ON nicks.nickID = contacts.nickID2
-    WHERE	(contacts.nickID1 = #Session.nickID#)
+    WHERE	(contacts.nickID1 = #Session.nickID#) AND
+            (contacts.status = 1)
 
     UNION
 
     SELECT	DISTINCT TOP (200) contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
     FROM	nicks INNER JOIN
             contacts ON nicks.nickID = contacts.nickID1
-    WHERE	(contacts.nickID2 = #Session.nickID#)
+    WHERE	(contacts.nickID2 = #Session.nickID#) AND
+            (contacts.status = 1)
     ORDER BY nicks.loginState DESC
 </cfquery>
 <cfif contactList.recordCount>
@@ -42,31 +44,30 @@
 </cfif>
 
 <cfquery datasource="imsg" name="nonContactList">
-    SELECT nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
-    FROM	nicks
-    WHERE (nicks.nickID <> #Session.nickID#)
-    EXCEPT (
-        SELECT	DISTINCT TOP (200) nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
-        FROM	nicks INNER JOIN
-                contacts ON nicks.nickID = contacts.nickID2
-        WHERE	(contacts.nickID1 = #Session.nickID#)
+    SELECT	DISTINCT TOP (200) nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState, contacts.status
+    FROM	nicks INNER JOIN
+            contacts ON nicks.nickID = contacts.nickID2
+    WHERE	(contacts.nickID1 = #Session.nickID#) AND
+            (contacts.status <> 1)
 
-        UNION
+    UNION
 
-        SELECT	DISTINCT TOP (200) nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
-        FROM	nicks INNER JOIN
-                contacts ON nicks.nickID = contacts.nickID1
-        WHERE	(contacts.nickID2 = #Session.nickID#)
-    )
+    SELECT	DISTINCT TOP (200) nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState, contacts.status
+    FROM	nicks INNER JOIN
+            contacts ON nicks.nickID = contacts.nickID1
+    WHERE	(contacts.nickID2 = #Session.nickID#) AND
+            (contacts.status <> 1)
     ORDER BY nicks.loginState DESC
 </cfquery>
 <cfif nonContactList.recordCount>
     <hr/>
     Arkadaş Ekle
     <cfloop query="noncontactList">
-        <a href="##" class="chatperson" onClick="contactRequest(#nickID#);">
+        <cfset event = noncontactList.status eq 0 ? "contactRequest(#nickID#);" : "">
+        <a href="##" class="chatperson" id="#nickID#" onClick="#event#">
             <span class="chatimg">
-                <button class="btn glyphicon glyphicon-plus">
+                <cfset cls = noncontactList.status eq 0 ? "btn glyphicon glyphicon-plus" : "btn glyphicons glyphicons-plus">
+                <button id="#nickID#" class="#cls#">
                 <!---<span class="glyphicon glyphicon-plus"></span>--->
                 </button>
             </span>

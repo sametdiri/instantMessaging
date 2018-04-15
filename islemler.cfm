@@ -29,7 +29,7 @@
 <cfelseif form.islem eq "contactAdd">
     <cfquery datasource="imsg" name="contactReq">
         INSERT INTO contacts(nickID1, nickID2)
-        VALUES (#session.nickID#, ##)
+        VALUES (#session.nickID#, #form.reciever#)
     </cfquery>
 <cfelseif form.islem eq "logout">
     <cfquery datasource="imsg" name="logoutUpdate">
