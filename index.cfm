@@ -82,7 +82,6 @@
 			//params = new FormData("#giris"),
 			//alert(params);
 			AJAXReqSend();
-			//refreshContactRequest();
 			refreshContacts();
 			refreshchatbody();
 		}
@@ -98,12 +97,23 @@
 				messageSend();
 			}
 		}
+		
+		function requestStatus(id, stat){
+			url = "islemler.cfm";			
+			divName = "";//the div is changed.
+			params = "islem=requestStatus&contactID="+id+"&status="+stat;
+			AJAXReqSend();
+			if(stat){
+				alert("Arkadaþlýk isteðiniz kabul edildi!");
+			else
+				alert("Arkadaþlýk isteðiniz ret edildi!");
+		}
 		function contactRequest(id){
 			url = "islemler.cfm";			
 			divName = "";//the div is changed.
 			params = "islem=contactAdd&reciever="+id;
 			AJAXReqSend();
-			alert("ArkadaÅŸlÄ±k isteÄŸiniz gÃ¶nderildi!");
+			alert("Arkadaþlýk isteðiniz gönderildi!");
 			//$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
@@ -123,29 +133,12 @@
 			params = "islem=logout&nickID="+nickID;//the Params for querying.
 			AJAXReqSend();
 		}
-
-		//refreshContacts();
-		//refreshchatbody();
-		//refreshContactRequest();
-		function refreshContactRequest(){
-			url = "islemler.cfm";
-			div = "";
-			params = "islem=contactRequests";
-			AJAXReqSend();			
-			setTimeout(refreshContactRequest, interval);
-		}
-		function refreshContacts(){
-			url = "contactList.cfm";
-			div = "contactList";
-			params = "islem=contacts";
-			AJAXReqSend();			
+		function refreshContacts(){	
+			$("div#contactList").load("contactList.cfm?islem=contacts");
 			setTimeout(refreshContacts, interval);
 		}
-		function refreshchatbody(){
-			url = "chatbody.cfm";
-			div = "chatbody";
-			params = "islem=chat";
-			AJAXReqSend();			
+		function refreshchatbody(){	
+			$("div#chatbody").load("chatbody.cfm?islem=chat");
 			setTimeout(refreshchatbody, interval);
 		}<!--- --->
 		
@@ -154,7 +147,7 @@
 				type		: "POST",
 				url			: url,
 				data		: params,
-				error		: function() {alert('Hata.. islem sayfasina erisilemedi\n LÃ¼tfen tekrar deneyiniz...');},
+				error		: function() {alert('Hata.. islem sayfasina erisilemedi\n Lütfen tekrar deneyiniz...');},
 				success 	: function(Sonuc) {
 												$("div#"+divName).html(Sonuc);													
 											  }

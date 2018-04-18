@@ -1,4 +1,4 @@
-<cfset session.reciever = 2>
+﻿<cfset session.reciever = 2>
 <cfoutput>
 <div class="container">
     <div class="row">
@@ -16,7 +16,7 @@
                         <div class="row">
                             <button class="btn btn-info btn-sm pull-right" title="Çıkış" onClick="logout(#Session.nickID#);"><span class="glyphicon glyphicon-remove"></span></button>
                             <div class="chatbody" id="chatbody">
-                            <cfinclude  template="chatbody.cfm"><!------>
+                            	<cfinclude  template="chatbody.cfm"><!------>
                             </div>
                             <div class="row">
                                 <div class="col-xs-9">

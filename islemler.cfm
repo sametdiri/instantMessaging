@@ -1,4 +1,4 @@
-<cfdump  var="#form#"><!---  --->
+﻿<cfdump  var="#form#"><!---  --->
 <cfif form.islem eq "nickSend">
     <cfquery datasource="iMsg" name="nickCheck">
         DECLARE @@nickID int = 0

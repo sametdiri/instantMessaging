@@ -1,4 +1,5 @@
-<cfoutput>
+﻿<cfoutput>
+<div>
 <cfquery datasource="imsg" name="getMessages">
     SELECT  msgID, senderID, recieverID, message, sendDate
     FROM    messages
@@ -21,4 +22,5 @@
         Henüz mesaj gönderilmemiş. Yeni bir konuşma başlatmak için bir şeyler yazın.
     </div>
 </cfif>
+</div>
 </cfoutput>
