@@ -4,9 +4,14 @@
 	<!--- Template Source: https://bootsnipp.com/snippets/AXEM5 --->
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9" />
 	<title>Messenger Project</title>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <!---<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>--->
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 	<!---<link href="/KOUBS/Samet/iMessage/resources/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<script src="/KOUBS/Samet/iMessage/resources/js/bootstrap.min.js"></script>
 	<script src="/KOUBS/Samet/iMessage/resources/js/jquery.min.js"></script>--->
@@ -77,8 +82,9 @@
 			//params = new FormData("#giris"),
 			//alert(params);
 			AJAXReqSend();
-			//refreshContacts();
-			//refreshchatbody();
+			//refreshContactRequest();
+			refreshContacts();
+			refreshchatbody();
 		}
 		function changeReciever(){
 			reciever = $("#reciever").val();
@@ -98,7 +104,7 @@
 			params = "islem=contactAdd&reciever="+id;
 			AJAXReqSend();
 			alert("Arkadaşlık isteğiniz gönderildi!");
-			$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
+			//$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
 			changeReciever();
@@ -120,6 +126,14 @@
 
 		//refreshContacts();
 		//refreshchatbody();
+		//refreshContactRequest();
+		function refreshContactRequest(){
+			url = "islemler.cfm";
+			div = "";
+			params = "islem=contactRequests";
+			AJAXReqSend();			
+			setTimeout(refreshContactRequest, interval);
+		}
 		function refreshContacts(){
 			url = "contactList.cfm";
 			div = "contactList";
@@ -142,7 +156,7 @@
 				data		: params,
 				error		: function() {alert('Hata.. islem sayfasina erisilemedi\n Lütfen tekrar deneyiniz...');},
 				success 	: function(Sonuc) {
-												$("div#"+divName).html(Sonuc).show();													
+												$("div#"+divName).html(Sonuc);													
 											  }
 			});/**/
 		}
@@ -152,6 +166,7 @@
 <body>
 	<h3>Yazilim Laboratuvari-II</h3>
 	<h4>Proje-II<br>Samet Diri, Furkan Selcuk Dag<br>170202128, 170202129</h4>
+	<!---<div id="contactRequest"></div>--->
 	<div id="application">
 		<div class="row">
 			<div class="col-lg-4"></div>

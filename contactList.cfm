@@ -67,7 +67,7 @@
         <a href="##" class="chatperson" id="#nickID#" onClick="#event#">
             <span class="chatimg">
                 <cfset cls = noncontactList.status eq 0 ? "btn glyphicon glyphicon-plus" : "btn glyphicons glyphicons-plus">
-                <button id="#nickID#" class="#cls#">
+                <button id="#nickID#" class="btn glyphicon glyphicon-plus">
                 <!---<span class="glyphicon glyphicon-plus"></span>--->
                 </button>
             </span>
