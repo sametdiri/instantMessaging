@@ -1,5 +1,5 @@
-﻿<cfdump  var="#form#"><!---  --->
-<cfif form.islem eq "nickSend">
+﻿<!---<cfdump  var="#form#">  --->
+<cfif form.islem eq "nickSend"><!--- Oturum açıldığında --->
     <cfquery datasource="iMsg" name="nickCheck">
         DECLARE @@nickID int = 0
 
@@ -21,55 +21,51 @@
     </cfquery>
     <cfset Session.nickID = nickCheck.nickID>
     <cfinclude  template="mainWindow.cfm">
-<cfelseif form.islem eq "messageSend">
+    
+<cfelseif form.islem eq "messageSend"><!--- Mesaj gönderildiğinde --->
     <cfquery datasource="imsg" name="insertMsg">
         INSERT INTO messages(senderID, recieverID, message)
         VALUES (#form.sender#, #form.reciever#, '#form.message#')
     </cfquery>
-<cfelseif form.islem eq "contactAdd">
+    
+<cfelseif form.islem eq "contactAdd"><!--- Arkadaş eklendiğinde --->
     <cfquery datasource="imsg" name="checkContactReq">
         SELECT  contactID, status 
         FROM    contacts 
         WHERE   nickID1 = #session.nickID# AND 
                 nickID2 = #form.reciever#
+                
+        UNION
+        
+        SELECT  contactID, status 
+        FROM    contacts 
+        WHERE   nickID1 = #form.reciever# AND 
+                nickID2 = #session.nickID#
     </cfquery>
-    <cfif not checkContactReq.recordCount>
+    <cfif not checkContactReq.recordCount><!--- Hiç istek gönderilmediyse --->
         <cfquery datasource="imsg" name="contactReq">
             INSERT INTO contacts(nickID1, nickID2)
             VALUES (#session.nickID#, #form.reciever#)
         </cfquery>
-    <cfelse>
+    <cfelse><!--- Daha önce istek gönderildiyse ve ret edildiyse --->
         <cfquery datasource="imsg" name="contactReqUpdate">
             UPDATE  contacts
             SET     status = 2
             WHERE   contactID = #checkContactReq.contactID#
         </cfquery>
     </cfif>
-<cfelseif form.islem eq "contactRequests">
-<script>
-    alert("Çalıştı!");
-</script>
-    <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
     
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Modal Header</h4>
-        </div>
-        <div class="modal-body">
-          <p>Some text in the modal.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-<cfelseif form.islem eq "logout">
+<cfelseif form.islem eq "requestStatus"><!--- Arkadaşlık isteği yanıtlama--->
+	<cfquery datasource="imsg" name="contactReqUpdate">
+        UPDATE  contacts
+        SET     status = #form.status#
+        WHERE   contactID = #form.contactID#
+    </cfquery>
+    
+<cfelseif form.islem eq "changeReciever"><!--- Alıcı değiştirildiğinde --->
+	<cfset session.Reciever = form.reciever>
+    
+<cfelseif form.islem eq "logout"><!--- Çıkış yapıldığında --->
     <cfquery datasource="imsg" name="logoutUpdate">
         UPDATE  nicks 
         SET     loginState = '0', loginTime = GETDATE()

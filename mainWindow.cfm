@@ -1,5 +1,4 @@
-﻿<cfset session.reciever = 2>
-<cfoutput>
+﻿<cfoutput>
 <div class="container">
     <div class="row">
         <table class="table table-stripped">

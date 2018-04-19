@@ -17,6 +17,15 @@
             </tr>
         </cfloop>
     </table>
+    <cfquery datasource="iMsg" name="changeSeen">
+    	UPDATE	messages
+        SET		seen = 1
+        WHERE	(seen = 0) AND (recieverID = #Session.nickID#) AND (senderID = #session.reciever#)
+    </cfquery>
+<cfelseif session.reciever eq 0>
+	<div class="alert alert-info">
+        Mesajlaşmaya başlamak için lütfen bir alıcı seçin.
+    </div>
 <cfelse>
     <div class="alert alert-info">
         Henüz mesaj gönderilmemiş. Yeni bir konuşma başlatmak için bir şeyler yazın.

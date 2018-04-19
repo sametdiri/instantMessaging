@@ -65,9 +65,12 @@
 			text-align:right;
 		}
 	</style>
+    <cfset session.reciever = 0>
     <script>
 		var interval = 5000;
 		var divName, params, url, sender, reciever;
+		changeReciever(0);
+		
 		function nickSendEnter(e){
 			var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
 			if(charCode == 13){
@@ -85,8 +88,18 @@
 			refreshContacts();
 			refreshchatbody();
 		}
-		function changeReciever(){
-			reciever = $("#reciever").val();
+		function changeReciever(id){
+			changeSender();
+			reciever = id;
+			$("#reciever").val(id);
+			//alert($("#reciever").val());
+			url = "islemler.cfm";
+			divName = "";//the div is changed.
+			params = "islem=changeReciever&reciever="+id;//the Params for querying.
+			AJAXReqSend();
+			refreshContacts()
+			refreshchatbody();
+			
 		}
 		function changeSender(){
 			sender = $("#sender").val();
@@ -103,7 +116,7 @@
 			divName = "";//the div is changed.
 			params = "islem=requestStatus&contactID="+id+"&status="+stat;
 			AJAXReqSend();
-			if(stat){
+			if(stat)
 				alert("Arkadaþlýk isteðiniz kabul edildi!");
 			else
 				alert("Arkadaþlýk isteðiniz ret edildi!");
@@ -117,15 +130,13 @@
 			//$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
-			changeReciever();
-			changeSender();
-
 			message = $("#messageBody").val();
 			url = "islemler.cfm";
 			divName = "";//the div is changed.
 			params = "islem=messageSend&sender=" + sender + "&reciever=" + reciever + "&message="+message;//the Params for querying.
 			AJAXReqSend();
 			$("#messageBody").val('');
+			refreshchatbody();
 		}
 		function logout(nickID){
 			url = "islemler.cfm";			
@@ -140,7 +151,7 @@
 		function refreshchatbody(){	
 			$("div#chatbody").load("chatbody.cfm?islem=chat");
 			setTimeout(refreshchatbody, interval);
-		}<!--- --->
+		}
 		
 		function AJAXReqSend(){
 			$.ajax({
@@ -151,7 +162,7 @@
 				success 	: function(Sonuc) {
 												$("div#"+divName).html(Sonuc);													
 											  }
-			});/**/
+			});
 		}
 		
 	</script>
