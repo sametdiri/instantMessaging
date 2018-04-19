@@ -2,14 +2,6 @@
 <div>
 <!--- Arkadaşlık isteklerini gösteren kısım --->
 <cfquery datasource="iMsg" name="contactRequestList">
-    <!---SELECT	DISTINCT TOP (200) contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
-    FROM	nicks INNER JOIN
-            contacts ON nicks.nickID = contacts.nickID2
-    WHERE	(contacts.nickID1 = #Session.nickID#) AND
-            (contacts.status = 2)
-
-    UNION--->
-
     SELECT	DISTINCT contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
     FROM	nicks INNER JOIN
             contacts ON nicks.nickID = contacts.nickID1

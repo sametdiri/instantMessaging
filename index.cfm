@@ -67,7 +67,7 @@
 	</style>
     <cfset session.reciever = 0>
     <script>
-		var interval = 5000;
+		var interval = 15000;
 		var divName, params, url, sender, reciever;
 		changeReciever(0);
 		
