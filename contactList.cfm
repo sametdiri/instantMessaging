@@ -89,20 +89,35 @@
 
 <!--- Arkadaş olmayan kullanıcıları gösteren kısım --->
 <cfquery datasource="imsg" name="nonContactList">
-	SELECT DISTINCT nickID, nick, ip, loginTime, loginState, status 
+	<!---SELECT DISTINCT nickID, nick, ip, loginTime, loginState, status 
 	FROM (
 		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status
-		FROM	dbo.nicks INNER JOIN
+		FROM	dbo.nicks LEFT OUTER JOIN
 				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID1
 		WHERE	(dbo.nicks.nickID <> #Session.nickID#) AND
 				(dbo.contacts.status = 0)
 		UNION
 		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status
-		FROM	dbo.nicks INNER JOIN
+		FROM	dbo.nicks LEFT OUTER JOIN
 				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID2
 		WHERE	(dbo.nicks.nickID <> #Session.nickID#) AND
 				(dbo.contacts.status = 0)
 		) AS TBL1
+	WHERE (status = 0)--->
+	SELECT DISTINCT nickID, nick, ip, loginTime, loginState, status 
+	FROM (
+		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status
+		FROM	dbo.nicks LEFT OUTER JOIN
+				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID1 OR dbo.nicks.nickID = dbo.contacts.nickID2
+		WHERE	(dbo.nicks.nickID <> #Session.nickID#)
+		) AS TBL1
+	WHERE (status IS NULL) AND
+		  (nickID NOT IN (
+							SELECT	DISTINCT dbo.nicks.nickID
+							FROM	dbo.nicks INNER JOIN
+									dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID1 OR dbo.nicks.nickID = dbo.contacts.nickID2
+							WHERE	(dbo.nicks.nickID <> #Session.nickID#) AND 
+									(dbo.contacts.status IN(1, 2))))
 </cfquery>
 <cfif nonContactList.recordCount>
     <hr/>
