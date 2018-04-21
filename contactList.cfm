@@ -89,10 +89,20 @@
 
 <!--- Arkadaş olmayan kullanıcıları gösteren kısım --->
 <cfquery datasource="imsg" name="nonContactList">
-    SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status, dbo.contacts.contactID
-    FROM	dbo.nicks LEFT OUTER JOIN
-			dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID2
-    WHERE	(dbo.nicks.nickID <> 1)
+	SELECT DISTINCT nickID, nick, ip, loginTime, loginState, status 
+	FROM (
+		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status
+		FROM	dbo.nicks INNER JOIN
+				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID1
+		WHERE	(dbo.nicks.nickID <> #Session.nickID#) AND
+				(dbo.contacts.status = 0)
+		UNION
+		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState, dbo.contacts.status
+		FROM	dbo.nicks INNER JOIN
+				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID2
+		WHERE	(dbo.nicks.nickID <> #Session.nickID#) AND
+				(dbo.contacts.status = 0)
+		) AS TBL1
 </cfquery>
 <cfif nonContactList.recordCount>
     <hr/>

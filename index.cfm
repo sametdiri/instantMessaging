@@ -4,13 +4,9 @@
 	<!--- Template Source: https://bootsnipp.com/snippets/AXEM5 --->
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9" />
 	<title>Messenger Project</title>
-    <!---<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>--->
-
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 	<!---<link href="/KOUBS/Samet/iMessage/resources/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<script src="/KOUBS/Samet/iMessage/resources/js/bootstrap.min.js"></script>
@@ -94,7 +90,7 @@
 			$("#reciever").val(id);
 			//alert($("#reciever").val());
 			url = "islemler.cfm";
-			divName = "";//the div is changed.
+			divName = "hidden";//the div is changed.
 			params = "islem=changeReciever&reciever="+id;//the Params for querying.
 			AJAXReqSend();
 			refreshContacts()
@@ -113,9 +109,10 @@
 		
 		function requestStatus(id, stat){
 			url = "islemler.cfm";			
-			divName = "";//the div is changed.
+			divName = "hidden";//the div is changed.
 			params = "islem=requestStatus&contactID="+id+"&status="+stat;
 			AJAXReqSend();
+			refreshContacts();
 			if(stat)
 				alert("Arkadaşlık isteğiniz kabul edildi!");
 			else
@@ -123,16 +120,17 @@
 		}
 		function contactRequest(id){
 			url = "islemler.cfm";			
-			divName = "";//the div is changed.
+			divName = "hidden";//the div is changed.
 			params = "islem=contactAdd&reciever="+id;
 			AJAXReqSend();
+			refreshContacts();
 			alert("Arkadaşlık isteğiniz gönderildi!");
 			//$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
 			message = $("#messageBody").val();
 			url = "islemler.cfm";
-			divName = "";//the div is changed.
+			divName = "hidden";//the div is changed.
 			params = "islem=messageSend&sender=" + sender + "&reciever=" + reciever + "&message="+message;//the Params for querying.
 			AJAXReqSend();
 			$("#messageBody").val('');

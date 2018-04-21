@@ -50,7 +50,9 @@
     <cfelse><!--- Daha önce istek gönderildiyse ve ret edildiyse --->
         <cfquery datasource="imsg" name="contactReqUpdate">
             UPDATE  contacts
-            SET     status = 2
+            SET     nickID1 = #session.nickID#,
+					nickID2 = #form.reciever#,
+					status = 2
             WHERE   contactID = #checkContactReq.contactID#
         </cfquery>
     </cfif>
