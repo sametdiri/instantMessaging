@@ -7,10 +7,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-	<!---<link href="/KOUBS/Samet/iMessage/resources/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-	<script src="/KOUBS/Samet/iMessage/resources/js/bootstrap.min.js"></script>
-	<script src="/KOUBS/Samet/iMessage/resources/js/jquery.min.js"></script>--->
 	<style>
 		.chatperson{
 			display: block;
@@ -88,7 +84,6 @@
 			changeSender();
 			reciever = id;
 			$("#reciever").val(id);
-			//alert($("#reciever").val());
 			url = "islemler.cfm";
 			divName = "hidden";//the div is changed.
 			params = "islem=changeReciever&reciever="+id;//the Params for querying.
@@ -125,7 +120,6 @@
 			AJAXReqSend();
 			refreshContacts();
 			alert("Arkadaþlýk isteðiniz gönderildi!");
-			//$("#"+id).attr("class", "btn glyphicons glyphicons-pending-notifications");
 		}
 		function messageSend(){
 			message = $("#messageBody").val();

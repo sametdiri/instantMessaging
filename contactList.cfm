@@ -111,7 +111,6 @@
     <hr/>
     Arkadaş Ekle
     <cfloop query="noncontactList">
-    	<!---<cfif noncontactList.status eq "" or noncontactList.status eq 0>--->
 		<cfif not listFind(reqList, noncontactList.nickID)>
             <a href="##" class="chatperson" id="#nickID#" onClick="contactRequest(#nickID#);">
                 <span class="chatimg">

@@ -1,5 +1,4 @@
-﻿<!---<cfdump  var="#form#">  --->
-<cfif form.islem eq "nickSend"><!--- Oturum açıldığında --->
+﻿<cfif form.islem eq "nickSend"><!--- Oturum açıldığında --->
     <cfquery datasource="iMsg" name="nickCheck">
         DECLARE @@nickID int = 0
 

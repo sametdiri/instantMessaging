@@ -1,0 +1,634 @@
+// Application.cfm
+
+	<cfapplication name="iMessage" sessionManagement="true">
+
+
+//index.cfm
+
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<!--- Template Source: https://bootsnipp.com/snippets/AXEM5 --->
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-9" />
+		<title>Messenger Project</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.chatperson{
+				display: block;
+				border-bottom: 1px solid #eee;
+				width: 100%;
+				display: flex;
+				align-items: center;
+				white-space: nowrap;
+				overflow: hidden;
+				margin-bottom: 15px;
+				padding: 4px;
+			}
+			.chatperson:hover{
+				text-decoration: none;
+				border-bottom: 1px solid orange;
+			}
+			.namechat {
+				display: inline-block;
+				vertical-align: middle;
+			}
+			.chatperson .chatimg img{
+				width: 40px;
+				height: 40px;
+				background-image: url('http://i.imgur.com/JqEuJ6t.png');
+			}
+			.chatperson .pname{
+				font-size: 18px;
+				padding-left: 5px;
+			}
+			.chatperson .lastmsg{
+				font-size: 12px;
+				padding-left: 5px;
+				color: #ccc;
+			}
+			.chatbody, contactList{
+				width:fixed;
+			}
+			.avatar{
+				width:55px;
+				height:55px;
+			}
+			.msg{
+				width:80%;
+			}
+			.dtime{
+				width:10%;
+				font-size:8pt;
+				text-align:right;
+			}
+		</style>
+		<cfset session.reciever = 0>
+		<script>
+			var interval = 15000;
+			var divName, params, url, sender, reciever;
+			changeReciever(0);
+			
+			function nickSendEnter(e){
+				var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
+				if(charCode == 13){
+					nickSend();
+				}
+			}
+			function nickSend(){
+				nick = $("#nick").val();
+				url = "islemler.cfm";
+				divName = "application";//the div is changed.
+				params = "islem=nickSend&nick="+nick;//the Params for querying.
+				//params = new FormData("#giris"),
+				//alert(params);
+				AJAXReqSend();
+				refreshContacts();
+				refreshchatbody();
+			}
+			function changeReciever(id){
+				changeSender();
+				reciever = id;
+				$("#reciever").val(id);
+				url = "islemler.cfm";
+				divName = "hidden";//the div is changed.
+				params = "islem=changeReciever&reciever="+id;//the Params for querying.
+				AJAXReqSend();
+				refreshContacts()
+				refreshchatbody();
+				
+			}
+			function changeSender(){
+				sender = $("#sender").val();
+			}
+			function messageSendEnter(e){
+				var charCode = (typeof e.which === "number") ? e.which : e.keyCode;
+				if(charCode == 13){
+					messageSend();
+				}
+			}
+			
+			function requestStatus(id, stat){
+				url = "islemler.cfm";			
+				divName = "hidden";//the div is changed.
+				params = "islem=requestStatus&contactID="+id+"&status="+stat;
+				AJAXReqSend();
+				refreshContacts();
+				if(stat)
+					alert("Arkadaşlık isteğiniz kabul edildi!");
+				else
+					alert("Arkadaşlık isteğiniz ret edildi!");
+			}
+			function contactRequest(id){
+				url = "islemler.cfm";			
+				divName = "hidden";//the div is changed.
+				params = "islem=contactAdd&reciever="+id;
+				AJAXReqSend();
+				refreshContacts();
+				alert("Arkadaşlık isteğiniz gönderildi!");
+			}
+			function messageSend(){
+				message = $("#messageBody").val();
+				url = "islemler.cfm";
+				divName = "hidden";//the div is changed.
+				params = "islem=messageSend&sender=" + sender + "&reciever=" + reciever + "&message="+message;//the Params for querying.
+				AJAXReqSend();
+				$("#messageBody").val('');
+				refreshchatbody();
+			}
+			function logout(nickID){
+				url = "islemler.cfm";			
+				divName = "application";//the div is changed.
+				params = "islem=logout&nickID="+nickID;//the Params for querying.
+				AJAXReqSend();
+			}
+			function refreshContacts(){	
+				$("div#contactList").load("contactList.cfm?islem=contacts");
+				setTimeout(refreshContacts, interval);
+			}
+			function refreshchatbody(){	
+				$("div#chatbody").load("chatbody.cfm?islem=chat");
+				setTimeout(refreshchatbody, interval);
+			}
+			
+			function AJAXReqSend(){
+				$.ajax({
+					type		: "POST",
+					url			: url,
+					data		: params,
+					error		: function() {alert('Hata.. islem sayfasina erisilemedi\n Lütfen tekrar deneyiniz...');},
+					success 	: function(Sonuc) {
+													$("div#"+divName).html(Sonuc);													
+												  }
+				});
+			}
+			
+		</script>
+	</head>
+	<body>
+		<h3>Yazilim Laboratuvari-II</h3>
+		<h4>Proje-II<br>Samet Diri, Furkan Selcuk Dag<br>170202128, 170202129</h4>
+		<!---<div id="contactRequest"></div>--->
+		<div id="application">
+			<div class="row">
+				<div class="col-lg-4"></div>
+				<div class="col-lg-4">
+				<!---<form id="giris" enctype="multipart/form-data">
+					<input type="file" id="avatar" name="avatar">--->
+					<input type="text" id="nick" name="nick" class="input input-lg" placeholder="Nick" onKeyup="nickSendEnter(event);">
+					<button class="btn btn-info btn-lg" id="nickSend" onClick="nickSend();"><span class="glyphicon glyphicon-send"></span></button>
+				<!---</form>--->
+				</div>
+				<div class="col-lg-4"></div>
+			</div>
+		</div>
+	</body>
+	</html>
+
+//mainWindow.cfm
+
+	<cfoutput>
+	<div class="container">
+		<div class="row">
+			<table class="table table-stripped">
+				<tr>
+					<td class="col-sm-4">
+						<div class="row">
+							<div class="contactList" id="contactList">
+								<cfinclude  template="contactList.cfm">
+							</div>
+						</div>
+					</td>
+					<td class="col-sm-8">
+						<div class="row">
+							<button class="btn btn-info btn-sm pull-right" title="Çıkış" onClick="logout(#Session.nickID#);"><span class="glyphicon glyphicon-remove"></span></button>
+							<div class="chatbody" id="chatbody">
+								<cfinclude  template="chatbody.cfm">
+							</div>
+							<div class="row">
+								<div class="col-xs-9">
+									<input type="text" id="messageBody" placeholder="Mesajınızı buraya yazın..." class="form-control" onKeyUp="messageSendEnter(event);" />
+									<input type="hidden" id="sender" value="#session.nickID#">
+									<input type="hidden" id="reciever" value="#session.reciever#">
+								</div>
+								<div class="col-xs-3">
+									<button class="btn btn-info btn-block" onClick="messageSend();"><span class="glyphicon glyphicon-send"></span></button>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	</cfoutput>
+
+//contactList.cfm
+
+	<cfoutput>
+	<div>
+	<!--- Arkadaşlık isteklerini gösteren kısım --->
+	<cfquery datasource="iMsg" name="contactRequestList">
+		SELECT	DISTINCT contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
+		FROM	nicks INNER JOIN
+				contacts ON nicks.nickID = contacts.nickID1
+		WHERE	(contacts.nickID2 = #Session.nickID#) AND
+				(contacts.status = 2)
+		ORDER BY nicks.loginState DESC
+	</cfquery>
+	<cfif contactRequestList.recordCount>
+		<h5>Arkadaşlık İstekleri</h5>
+		<cfloop query="contactRequestList">
+			<a href="##" id="#nickID#" class="chatperson">
+				<span class="chatimg">
+					<button id="#nickID#" class="btn glyphicon glyphicon-plus" onclick="requestStatus(#contactID#, 1);" style="zoom:50%;"></button>
+					<button id="#nickID#" class="btn glyphicon glyphicon-minus" onclick="requestStatus(#contactID#, 0);" style="zoom:50%;"></button>
+				</span>
+	 
+				<div class="namechat">
+					<div class="pname">#nick#</div>
+					<div class="lastmsg">
+						<cfif loginState>
+							<span class="alert-success">
+								Online
+							</span>
+						<cfelse>
+							<span class="alert-danger">
+								Offline (Son giriş zamanı: #DateFormat(loginTime, "dd/mm/yyyy")# #TimeFormat(loginTime, "hh:MM:ss")#)
+							</span>
+						</cfif>
+					</div>
+				</div>
+			</a>
+		</cfloop>
+	</cfif>
+	<hr />
+
+	<!--- Arkadaşları gösteren kısım --->
+	<cfquery datasource="iMsg" name="contactList">
+		SELECT	DISTINCT TOP (200) contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
+		FROM	nicks INNER JOIN
+				contacts ON nicks.nickID = contacts.nickID2
+		WHERE	(contacts.nickID1 = #Session.nickID#) AND
+				(contacts.status = 1)
+
+		UNION
+
+		SELECT	DISTINCT TOP (200) contacts.contactID, nicks.nickID, nicks.nick, nicks.ip, nicks.loginTime, nicks.loginState
+		FROM	nicks INNER JOIN
+				contacts ON nicks.nickID = contacts.nickID1
+		WHERE	(contacts.nickID2 = #Session.nickID#) AND
+				(contacts.status = 1)
+		ORDER BY nicks.loginState DESC
+	</cfquery>
+	<cfif contactList.recordCount>
+		<cfloop query="contactList">
+			<cfquery datasource="iMsg" name="messageCheck">
+				SELECT	COUNT(msgID) AS msgCount
+				FROM	messages
+				WHERE	(seen = 0) AND (recieverID = #Session.nickID#) AND (senderID = #nickID#)
+			</cfquery>
+			<a href="##" id="#nickID#" class="chatperson" onclick="changeReciever(#nickID#);">
+				<span class="chatimg">
+					<img src="http://via.placeholder.com/50x50?text=A" alt="" />
+				</span>
+				<div class="namechat">
+					<div class="pname">#nick# #messageCheck.msgCount gt 0 ? "<span style='font-weight:bold; color:red;'>("&messageCheck.msgCount&")</span>" : ""#</div>
+					<div class="lastmsg">
+						<cfif loginState>
+							<span class="alert-success">
+								Online
+							</span>
+						<cfelse>
+							<span class="alert-danger">
+								Offline (Son giriş zamanı: #DateFormat(loginTime, "dd/mm/yyyy")# #TimeFormat(loginTime, "hh:MM:ss")#)
+							</span>
+						</cfif>
+					</div>
+				</div>
+			</a>
+		</cfloop>
+	<cfelse>
+		<div class="alert alert-danger">
+			<h5>:( Üzgünüz</h5><h6>Hiç arkadaşınız yok!</h6>
+		</div>
+	</cfif>
+
+	<!--- Arkadaş olmayan kullanıcıları gösteren kısım --->
+	<cfquery datasource="imsg" name="nonContactList">
+		SELECT	DISTINCT dbo.nicks.nickID, dbo.nicks.nick, dbo.nicks.ip, dbo.nicks.loginTime, dbo.nicks.loginState
+		FROM 	dbo.nicks
+		WHERE	(dbo.nicks.nickID <> #Session.nickID#)
+	</cfquery>
+	<cfquery datasource="iMsg" name="contactReqs">
+		SELECT	DISTINCT dbo.nicks.nickID
+		FROM	dbo.nicks INNER JOIN
+				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID1
+		WHERE	(dbo.contacts.nickID2 = #Session.nickID#) AND
+				(dbo.contacts.status IN (1,2))
+		UNION
+		SELECT	DISTINCT dbo.nicks.nickID
+		FROM	dbo.nicks INNER JOIN
+				dbo.contacts ON dbo.nicks.nickID = dbo.contacts.nickID2
+		WHERE	(dbo.contacts.nickID1 = #Session.nickID#) AND
+				(dbo.contacts.status IN (1,2))
+	</cfquery>
+	<cfset reqList = ValueList(contactReqs.nickID)>
+	<cfif nonContactList.recordCount>
+		<hr/>
+		Arkadaş Ekle
+		<cfloop query="noncontactList">
+			<cfif not listFind(reqList, noncontactList.nickID)>
+				<a href="##" class="chatperson" id="#nickID#" onClick="contactRequest(#nickID#);">
+					<span class="chatimg">
+						<button id="#nickID#" class="btn glyphicon glyphicon-plus">
+						</button>
+					</span>
+					<div class="namechat">
+						<div class="pname">#nick#</div>
+						<div class="lastmsg">
+							<cfif loginState>
+								<span class="alert-success">
+									Online
+								</span>
+							<cfelse>
+								<span class="alert-danger">
+									Offline (Son giriş zamanı: #DateFormat(loginTime, "dd/mm/yyyy")# #TimeFormat(loginTime, "hh:MM:ss")#)
+								</span>
+							</cfif>
+						</div>
+					</div>
+				</a>
+			</cfif>
+		</cfloop>
+	</cfif>
+	</div>
+	</cfoutput>
+
+//chatBody.cfm
+
+	<cfoutput>
+	<div>
+	<cfquery datasource="imsg" name="getMessages">
+		SELECT  msgID, senderID, recieverID, message, sendDate
+		FROM    messages
+		WHERE   (senderID = #session.nickID# AND recieverID = #session.reciever#) OR
+				(senderID = #session.reciever# AND recieverID = #session.nickID#)
+		ORDER BY sendDate
+	</cfquery>
+	<cfif getMessages.recordCount>
+		<table class="table">
+			<cfloop query="getMessages">
+				<tr>
+					<td class="avatar"><img src="http://via.placeholder.com/50x50?text=A" /></td>
+					<td class="msg">#message#</td>
+					<td class="dtime">#dateFormat(sendDate, "dd/mm/yyyy")# #timeFormat(sendDate, "HH:mm:ss")#</td>
+				</tr>
+			</cfloop>
+		</table>
+		<cfquery datasource="iMsg" name="changeSeen">
+			UPDATE	messages
+			SET		seen = 1
+			WHERE	(seen = 0) AND (recieverID = #Session.nickID#) AND (senderID = #session.reciever#)
+		</cfquery>
+	<cfelseif session.reciever eq 0>
+		<div class="alert alert-info">
+			Mesajlaşmaya başlamak için lütfen bir alıcı seçin.
+		</div>
+	<cfelse>
+		<div class="alert alert-info">
+			Henüz mesaj gönderilmemiş. Yeni bir konuşma başlatmak için bir şeyler yazın.
+		</div>
+	</cfif>
+	</div>
+	</cfoutput>
+
+//islemler.cfm
+
+	<cfif form.islem eq "nickSend"><!--- Oturum açıldığında --->
+		<cfquery datasource="iMsg" name="nickCheck">
+			DECLARE @@nickID int = 0
+
+			SELECT  @@nickID = nickID
+			FROM    nicks
+			WHERE   (nick = '#form.nick#')
+			IF(@@ROWCOUNT = 0)
+			BEGIN
+				INSERT INTO nicks(nick, ip) VALUES ('#form.nick#', '#CGI.REMOTE_ADDR#')
+				SELECT @@nickID = @@identity
+			END
+			ELSE
+			BEGIN
+				UPDATE  nicks 
+				SET     ip = '#CGI.REMOTE_ADDR#', loginState = '1', loginTime = GETDATE()
+				WHERE   nickID = @@nickID
+			END
+			SELECT @@nickID AS nickID
+		</cfquery>
+		<cfset Session.nickID = nickCheck.nickID>
+		<cfinclude  template="mainWindow.cfm">
+		
+	<cfelseif form.islem eq "messageSend"><!--- Mesaj gönderildiğinde --->
+		<cfquery datasource="imsg" name="insertMsg">
+			INSERT INTO messages(senderID, recieverID, message)
+			VALUES (#form.sender#, #form.reciever#, '#form.message#')
+		</cfquery>
+		
+	<cfelseif form.islem eq "contactAdd"><!--- Arkadaş eklendiğinde --->
+		<cfquery datasource="imsg" name="checkContactReq">
+			SELECT  contactID, status 
+			FROM    contacts 
+			WHERE   nickID1 = #session.nickID# AND 
+					nickID2 = #form.reciever#
+					
+			UNION
+			
+			SELECT  contactID, status 
+			FROM    contacts 
+			WHERE   nickID1 = #form.reciever# AND 
+					nickID2 = #session.nickID#
+		</cfquery>
+		<cfif not checkContactReq.recordCount><!--- Hiç istek gönderilmediyse --->
+			<cfquery datasource="imsg" name="contactReq">
+				INSERT INTO contacts(nickID1, nickID2)
+				VALUES (#session.nickID#, #form.reciever#)
+			</cfquery>
+		<cfelse><!--- Daha önce istek gönderildiyse ve ret edildiyse --->
+			<cfquery datasource="imsg" name="contactReqUpdate">
+				UPDATE  contacts
+				SET     nickID1 = #session.nickID#,
+						nickID2 = #form.reciever#,
+						status = 2
+				WHERE   contactID = #checkContactReq.contactID#
+			</cfquery>
+		</cfif>
+		
+	<cfelseif form.islem eq "requestStatus"><!--- Arkadaşlık isteği yanıtlama--->
+		<cfquery datasource="imsg" name="contactReqUpdate">
+			UPDATE  contacts
+			SET     status = #form.status#
+			WHERE   contactID = #form.contactID#
+		</cfquery>
+		
+	<cfelseif form.islem eq "changeReciever"><!--- Alıcı değiştirildiğinde --->
+		<cfset session.Reciever = form.reciever>
+		
+	<cfelseif form.islem eq "logout"><!--- Çıkış yapıldığında --->
+		<cfquery datasource="imsg" name="logoutUpdate">
+			UPDATE  nicks 
+			SET     loginState = '0', loginTime = GETDATE()
+			WHERE   nickID = #Session.nickID#
+		</cfquery>
+		<cfset structClear(Session)>
+		<meta http-equiv="refresh" content="0">
+	</cfif>
+
+//iMessageDB.sql
+
+	USE [master]
+	GO
+	/****** Object:  Database [iMessage]    Script Date: 21.04.2018 22:34:01 ******/
+	CREATE DATABASE [iMessage]
+	 CONTAINMENT = NONE
+	 ON  PRIMARY 
+	( NAME = N'iMessage', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\iMessage.mdf' , SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+	 LOG ON 
+	( NAME = N'iMessage_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQL\DATA\iMessage_log.ldf' , SIZE = 1024KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+	GO
+	ALTER DATABASE [iMessage] SET COMPATIBILITY_LEVEL = 110
+	GO
+	IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+	begin
+	EXEC [iMessage].[dbo].[sp_fulltext_database] @action = 'enable'
+	end
+	GO
+	ALTER DATABASE [iMessage] SET ANSI_NULL_DEFAULT OFF 
+	GO
+	ALTER DATABASE [iMessage] SET ANSI_NULLS OFF 
+	GO
+	ALTER DATABASE [iMessage] SET ANSI_PADDING OFF 
+	GO
+	ALTER DATABASE [iMessage] SET ANSI_WARNINGS OFF 
+	GO
+	ALTER DATABASE [iMessage] SET ARITHABORT OFF 
+	GO
+	ALTER DATABASE [iMessage] SET AUTO_CLOSE OFF 
+	GO
+	ALTER DATABASE [iMessage] SET AUTO_CREATE_STATISTICS ON 
+	GO
+	ALTER DATABASE [iMessage] SET AUTO_SHRINK OFF 
+	GO
+	ALTER DATABASE [iMessage] SET AUTO_UPDATE_STATISTICS ON 
+	GO
+	ALTER DATABASE [iMessage] SET CURSOR_CLOSE_ON_COMMIT OFF 
+	GO
+	ALTER DATABASE [iMessage] SET CURSOR_DEFAULT  GLOBAL 
+	GO
+	ALTER DATABASE [iMessage] SET CONCAT_NULL_YIELDS_NULL OFF 
+	GO
+	ALTER DATABASE [iMessage] SET NUMERIC_ROUNDABORT OFF 
+	GO
+	ALTER DATABASE [iMessage] SET QUOTED_IDENTIFIER OFF 
+	GO
+	ALTER DATABASE [iMessage] SET RECURSIVE_TRIGGERS OFF 
+	GO
+	ALTER DATABASE [iMessage] SET  DISABLE_BROKER 
+	GO
+	ALTER DATABASE [iMessage] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+	GO
+	ALTER DATABASE [iMessage] SET DATE_CORRELATION_OPTIMIZATION OFF 
+	GO
+	ALTER DATABASE [iMessage] SET TRUSTWORTHY OFF 
+	GO
+	ALTER DATABASE [iMessage] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+	GO
+	ALTER DATABASE [iMessage] SET PARAMETERIZATION SIMPLE 
+	GO
+	ALTER DATABASE [iMessage] SET READ_COMMITTED_SNAPSHOT OFF 
+	GO
+	ALTER DATABASE [iMessage] SET HONOR_BROKER_PRIORITY OFF 
+	GO
+	ALTER DATABASE [iMessage] SET RECOVERY FULL 
+	GO
+	ALTER DATABASE [iMessage] SET  MULTI_USER 
+	GO
+	ALTER DATABASE [iMessage] SET PAGE_VERIFY CHECKSUM  
+	GO
+	ALTER DATABASE [iMessage] SET DB_CHAINING OFF 
+	GO
+	ALTER DATABASE [iMessage] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+	GO
+	ALTER DATABASE [iMessage] SET TARGET_RECOVERY_TIME = 0 SECONDS 
+	GO
+	EXEC sys.sp_db_vardecimal_storage_format N'iMessage', N'ON'
+	GO
+	USE [iMessage]
+	GO
+	/****** Object:  Table [dbo].[contacts]    Script Date: 21.04.2018 22:34:02 ******/
+	SET ANSI_NULLS ON
+	GO
+	SET QUOTED_IDENTIFIER ON
+	GO
+	CREATE TABLE [dbo].[contacts](
+		[contactID] [int] IDENTITY(1,1) NOT NULL,
+		[nickID1] [int] NOT NULL,
+		[nickID2] [int] NOT NULL,
+		[status] [tinyint] NOT NULL CONSTRAINT [DF_contacts_status]  DEFAULT ((2)),
+	 CONSTRAINT [PK_contacts] PRIMARY KEY CLUSTERED 
+	(
+		[contactID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	GO
+	/****** Object:  Table [dbo].[messages]    Script Date: 21.04.2018 22:34:02 ******/
+	SET ANSI_NULLS ON
+	GO
+	SET QUOTED_IDENTIFIER ON
+	GO
+	SET ANSI_PADDING ON
+	GO
+	CREATE TABLE [dbo].[messages](
+		[msgID] [int] IDENTITY(1,1) NOT NULL,
+		[senderID] [int] NOT NULL,
+		[recieverID] [int] NOT NULL,
+		[message] [varchar](1000) NOT NULL,
+		[sendDate] [datetime] NOT NULL CONSTRAINT [DF_messages_sendDate]  DEFAULT (getdate()),
+		[seen] [bit] NOT NULL CONSTRAINT [DF_messages_seen]  DEFAULT ((0)),
+	 CONSTRAINT [PK_messages] PRIMARY KEY CLUSTERED 
+	(
+		[msgID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY]
+
+	GO
+	SET ANSI_PADDING OFF
+	GO
+	/****** Object:  Table [dbo].[nicks]    Script Date: 21.04.2018 22:34:02 ******/
+	SET ANSI_NULLS ON
+	GO
+	SET QUOTED_IDENTIFIER ON
+	GO
+	SET ANSI_PADDING ON
+	GO
+	CREATE TABLE [dbo].[nicks](
+		[nickID] [int] IDENTITY(1,1) NOT NULL,
+		[nick] [varchar](50) NOT NULL,
+		[ip] [varchar](50) NOT NULL,
+		[loginTime] [datetime] NOT NULL CONSTRAINT [DF_nicks_loginTime]  DEFAULT (getdate()),
+		[loginState] [bit] NOT NULL CONSTRAINT [DF_nicks_loginState]  DEFAULT ((1)),
+		[avatar] [image] NULL,
+	 CONSTRAINT [PK_nicks] PRIMARY KEY CLUSTERED 
+	(
+		[nickID] ASC
+	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+	GO
+	SET ANSI_PADDING OFF
+	GO
+	USE [master]
+	GO
+	ALTER DATABASE [iMessage] SET  READ_WRITE 
+	GO
